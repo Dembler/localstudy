@@ -11,7 +11,7 @@ dependencies = [
   "fastapi>=0.115.0",
   "pydantic>=2.9.0",
   "pydantic-settings>=2.5.0",
-  "sqlalchemy>=2.0.35",
+  "sqlalchemy[asyncio]>=2.0.35",
   "uvicorn[standard]>=0.30.0",
 ]
 
@@ -40,7 +40,7 @@ select = ["E", "F", "I", "UP", "B", "ASYNC"]
 python_version = "3.11"
 strict = true
 files = ["src", "run.py"]
-plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
+plugins = ["pydantic.mypy"]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

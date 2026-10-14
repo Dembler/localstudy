@@ -19,11 +19,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useLearningWorkspaceStore } from '@/shared/stores/learning'
+import { usePlanStore } from '@/shared/stores/plans'
+import { useSessionsStore } from '@/shared/stores/sessions'
+import { useAnalyticsStore } from '@/shared/stores/analytics'
+import { useNoticesStore } from '@/shared/stores/notices'
 
-const workspace = useLearningWorkspaceStore()
-const { plan, sessions, overview, skills, weakTopics, recommendations, loading, errors, demoMode } =
-  storeToRefs(workspace)
+const plansStore = usePlanStore()
+const { plan, loading: planLoading } = storeToRefs(plansStore)
+const sessionsStore = useSessionsStore()
+const { sessions, loading: sessionsLoading } = storeToRefs(sessionsStore)
+const analyticsStore = useAnalyticsStore()
+const {
+  overview,
+  skills,
+  weakTopics,
+  recommendations,
+  loading: analyticsLoading,
+  error: analyticsError,
+  demoMode: analyticsDemoMode,
+} = storeToRefs(analyticsStore)
+const noticesStore = useNoticesStore()
 
 const hasPersonalActivity = computed(
   () =>
@@ -55,9 +70,9 @@ const streakLabel = computed(() => {
 })
 
 onMounted(async () => {
-  workspace.clearActionMessage()
-  await workspace.loadPlan()
-  if (plan.value) await Promise.all([workspace.loadSessions(), workspace.loadAnalytics()])
+  noticesStore.clearActionMessage()
+  await plansStore.loadPlan()
+  if (plan.value) await Promise.all([sessionsStore.loadSessions(), analyticsStore.loadAnalytics()])
 })
 </script>
 
@@ -84,7 +99,7 @@ onMounted(async () => {
       </CardContent>
     </Card>
 
-    <Card v-if="loading.plan || (plan && (loading.analytics || loading.sessions))" class="min-h-72">
+    <Card v-if="planLoading || (plan && (analyticsLoading || sessionsLoading))" class="min-h-72">
       <CardContent class="grid min-h-72 content-center gap-4 p-6 sm:grid-cols-2">
         <Skeleton class="h-40 w-full" /><Skeleton class="h-40 w-full" />
         <Skeleton class="h-20 w-full sm:col-span-2" />
@@ -101,11 +116,11 @@ onMounted(async () => {
         <Button as-child><RouterLink to="/plan">Настроить обучение</RouterLink></Button>
       </CardContent>
     </Card>
-    <Alert v-else-if="errors.analytics && !skills.length" class="min-h-64 content-center">
+    <Alert v-else-if="analyticsError && !skills.length" class="min-h-64 content-center">
       <AlertTitle>Не удалось открыть прогресс</AlertTitle>
       <AlertDescription class="grid gap-4">
-        <span>{{ errors.analytics }}</span
-        ><Button variant="outline" class="w-fit" @click="workspace.loadAnalytics">
+        <span>{{ analyticsError }}</span
+        ><Button variant="outline" class="w-fit" @click="analyticsStore.loadAnalytics">
           Повторить
         </Button>
       </AlertDescription>
@@ -125,7 +140,7 @@ onMounted(async () => {
     </Card>
 
     <template v-else>
-      <Alert v-if="errors.analytics" class="mb-4 border-neutral-300" role="status">
+      <Alert v-if="analyticsError" class="mb-4 border-neutral-300" role="status">
         <AlertDescription>
           Часть показателей не удалось обновить. Ниже оставлены только полученные данные.
         </AlertDescription>
@@ -136,7 +151,7 @@ onMounted(async () => {
           учебные цели.
         </AlertDescription>
       </Alert>
-      <Alert v-if="demoMode.analytics" class="mb-4 border-neutral-300">
+      <Alert v-if="analyticsDemoMode" class="mb-4 border-neutral-300">
         <AlertTitle>Показаны демонстрационные данные</AlertTitle>
         <AlertDescription>
           Не удалось обновить ваши показатели. Ниже показан пример, а не личный прогресс.

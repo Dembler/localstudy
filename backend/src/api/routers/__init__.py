@@ -7,7 +7,7 @@ from src.api.routers.courses import router as courses_router
 from src.api.routers.plans import router as plans_router
 from src.api.routers.practice import router as practice_router
 from src.api.routers.sessions import router as sessions_router
-from src.application.schemas import ErrorResponse
+from src.api.schemas import ErrorResponse
 
 api_router = APIRouter()
 ERROR_RESPONSES: dict[int | str, dict[str, Any]] = {

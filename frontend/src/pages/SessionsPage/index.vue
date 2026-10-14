@@ -20,11 +20,24 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { UiSession } from '@/shared/data/demo'
-import { useLearningWorkspaceStore } from '@/shared/stores/learning'
+import type { UiSession } from '@/shared/types/learning'
+import { usePlanStore } from '@/shared/stores/plans'
+import { useSessionsStore } from '@/shared/stores/sessions'
+import { useNoticesStore } from '@/shared/stores/notices'
 
-const workspace = useLearningWorkspaceStore()
-const { plan, sessions, selectedSessionId, loading, errors, actionMessage } = storeToRefs(workspace)
+const plansStore = usePlanStore()
+const { plan, loading: planLoading } = storeToRefs(plansStore)
+const sessionsStore = useSessionsStore()
+const {
+  sessions,
+  selectedSessionId,
+  loading: sessionsLoading,
+  actionLoading: sessionActionLoading,
+  error: sessionsError,
+} = storeToRefs(sessionsStore)
+const noticesStore = useNoticesStore()
+const { actionMessage } = storeToRefs(noticesStore)
+
 const showSchedule = ref(false)
 const showCompleted = ref(false)
 const scheduledAt = ref('')
@@ -80,12 +93,12 @@ const formatTime = (value: string) =>
 
 const runPrimary = async () => {
   if (!selectedSession.value) return
-  await workspace.advanceSession(selectedSession.value.id)
+  await sessionsStore.advanceSession(selectedSession.value.id)
 }
 
 const schedule = async () => {
   const before = sessions.value.length
-  await workspace.scheduleLearningSession(scheduledAt.value)
+  await sessionsStore.scheduleLearningSession(scheduledAt.value)
   if (sessions.value.length > before) {
     showSchedule.value = false
     scheduledAt.value = ''
@@ -93,9 +106,9 @@ const schedule = async () => {
 }
 
 onMounted(async () => {
-  workspace.clearActionMessage()
-  await workspace.loadPlan()
-  if (plan.value) await workspace.loadSessions()
+  noticesStore.clearActionMessage()
+  await plansStore.loadPlan()
+  if (plan.value) await sessionsStore.loadSessions()
 })
 </script>
 
@@ -122,7 +135,7 @@ onMounted(async () => {
       </CardContent>
     </Card>
 
-    <Card v-if="loading.plan || (plan && loading.sessions)" class="min-h-64">
+    <Card v-if="planLoading || (plan && sessionsLoading)" class="min-h-64">
       <CardContent class="grid min-h-64 gap-3 p-6 sm:grid-cols-[minmax(0,1fr)_320px]">
         <div class="grid content-center gap-3">
           <Skeleton class="h-16 w-full" /><Skeleton class="h-16 w-full" />
@@ -149,11 +162,13 @@ onMounted(async () => {
           <AlertDescription>{{ actionMessage }}</AlertDescription>
         </Alert>
       </div>
-      <Alert v-if="errors.sessions && !sessions.length" class="min-h-64 content-center">
+      <Alert v-if="sessionsError && !sessions.length" class="min-h-64 content-center">
         <AlertTitle>Не удалось открыть расписание</AlertTitle>
         <AlertDescription class="grid gap-4">
-          <span>{{ errors.sessions }}</span>
-          <Button variant="outline" class="w-fit" @click="workspace.loadSessions">Повторить</Button>
+          <span>{{ sessionsError }}</span>
+          <Button type="button" variant="outline" class="w-fit" @click="sessionsStore.loadSessions">
+            Повторить
+          </Button>
         </AlertDescription>
       </Alert>
 
@@ -197,19 +212,19 @@ onMounted(async () => {
               <Button
                 class="mt-5 w-full"
                 type="button"
-                :disabled="loading.sessionAction"
+                :disabled="sessionActionLoading"
                 @click="runPrimary"
               >
                 <Check v-if="selectedSession.status === 'in_progress'" />
                 <Play v-else />
-                {{ loading.sessionAction ? 'Сохраняем…' : primaryLabel }}
+                {{ sessionActionLoading ? 'Сохраняем…' : primaryLabel }}
               </Button>
               <Button
                 variant="ghost"
                 class="mt-2 w-full"
                 type="button"
-                :disabled="loading.sessionAction"
-                @click="workspace.rescheduleSelectedSession"
+                :disabled="sessionActionLoading"
+                @click="sessionsStore.rescheduleSelectedSession"
               >
                 <RotateCcw /> Перенести на завтра
               </Button>
@@ -234,7 +249,7 @@ onMounted(async () => {
               :class="{ 'session-row--selected': selectedSession?.id === session.id }"
               type="button"
               :aria-pressed="selectedSession?.id === session.id"
-              @click="workspace.selectSession(session.id)"
+              @click="sessionsStore.selectSession(session.id)"
             >
               <span class="session-row__date">
                 <strong>{{ formatTime(session.startsAt) }}</strong>
@@ -296,7 +311,7 @@ onMounted(async () => {
           <Input id="scheduled-at" v-model="scheduledAt" type="datetime-local" required />
           <p class="m-0 text-xs text-neutral-600">Продолжительность — 45 минут.</p>
         </form>
-        <Alert v-if="errors.sessions" class="border-neutral-300" role="alert">
+        <Alert v-if="sessionsError" class="border-neutral-300" role="alert">
           <AlertDescription>
             Не удалось сохранить занятие. Попробуйте другое время.
           </AlertDescription>
@@ -306,9 +321,9 @@ onMounted(async () => {
           <Button
             form="schedule-form"
             type="submit"
-            :disabled="!scheduledAt || loading.sessionAction"
+            :disabled="!scheduledAt || sessionActionLoading"
           >
-            {{ loading.sessionAction ? 'Сохраняем…' : 'Запланировать' }}
+            {{ sessionActionLoading ? 'Сохраняем…' : 'Запланировать' }}
           </Button>
         </DialogFooter>
       </DialogContent>

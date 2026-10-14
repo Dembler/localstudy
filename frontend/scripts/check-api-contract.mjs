@@ -17,6 +17,9 @@ const groups = {
     'addPlanGoal',
     'rebalancePlan',
     'getPlanForecast',
+    'deletePlan',
+    'deletePlanGoal',
+    'removePlanCourse',
   ],
   'sessions.ts': [
     'getSessionCalendar',
@@ -24,6 +27,7 @@ const groups = {
     'startSession',
     'completeSession',
     'rescheduleSession',
+    'deleteSession',
   ],
   'practice.ts': [
     'getNextAssignment',
@@ -46,11 +50,11 @@ for (const [file, operations] of Object.entries(groups)) {
   }
 }
 
-if (count !== 25) throw new Error(`Ожидалось 25 бизнес-операций, найдено ${count}`)
+if (count !== 29) throw new Error(`Ожидалось 29 бизнес-операций, найдено ${count}`)
 
 const health = readFileSync(`${root}health.ts`, 'utf8')
 if (!health.includes('export async function getHealth')) {
   throw new Error('Техническая health-операция отсутствует')
 }
 
-stdout.write('API contract OK: 25 business operations + health\n')
+stdout.write('API contract OK: 29 business operations + health\n')

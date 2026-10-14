@@ -19,13 +19,17 @@ export {
 export {
   addPlanGoal,
   createPlan,
+  deletePlan,
+  deletePlanGoal,
   getPlanForecast,
   plansApi,
   rebalancePlan,
+  removePlanCourse,
   updatePlanWorkload,
 } from './plans'
 export {
   completeSession,
+  deleteSession,
   getSessionCalendar,
   rescheduleSession,
   scheduleSession,

@@ -3,8 +3,8 @@
 Учебный full-stack проект: адаптивный трекер обучения с каталогом курсов,
 персональным планом, календарём занятий, практикой и аналитикой.
 
-Проект содержит ровно **25 прикладных HTTP-операций** — по пять на каждый
-модуль. Полный перечень находится в [docs/api-contract.md](docs/api-contract.md).
+Проект содержит **29 прикладных HTTP-операций**. Полный перечень находится в
+[docs/api-contract.md](docs/api-contract.md).
 Технический `GET /health` в это количество не входит.
 
 ## Структура
@@ -69,6 +69,7 @@ cd ..\frontend
 npm.cmd run lint
 npm.cmd run format:check
 npm.cmd run typecheck
+npm.cmd test
 npm.cmd run check:api-contract
 npm.cmd run build
 ```

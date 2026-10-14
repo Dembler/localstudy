@@ -57,10 +57,21 @@ export async function rescheduleSession(
   })
 }
 
+export async function deleteSession(
+  sessionId: EntityId,
+  options?: ApiRequestOptions,
+): Promise<void> {
+  return apiRequest<void>(`/sessions/${encodeURIComponent(sessionId)}`, {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
 export const sessionsApi = {
   getSessionCalendar,
   scheduleSession,
   startSession,
   completeSession,
   rescheduleSession,
+  deleteSession,
 } as const

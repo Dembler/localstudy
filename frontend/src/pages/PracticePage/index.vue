@@ -13,11 +13,24 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { useLearningWorkspaceStore } from '@/shared/stores/learning'
+import { usePlanStore } from '@/shared/stores/plans'
+import { usePracticeStore } from '@/shared/stores/practice'
+import { useNoticesStore } from '@/shared/stores/notices'
 
-const workspace = useLearningWorkspaceStore()
-const { plan, assignment, attempts, visibleHint, lastAttemptFeedback, loading, errors } =
-  storeToRefs(workspace)
+const plansStore = usePlanStore()
+const { plan, loading: planLoading } = storeToRefs(plansStore)
+const practiceStore = usePracticeStore()
+const {
+  assignment,
+  attempts,
+  visibleHint,
+  lastAttemptFeedback,
+  loading: practiceLoading,
+  actionLoading: practiceActionLoading,
+  error: practiceError,
+} = storeToRefs(practiceStore)
+const noticesStore = useNoticesStore()
+
 const answer = ref('')
 const showHistory = ref(false)
 const feedbackShown = ref(false)
@@ -28,7 +41,7 @@ const answerWasCorrect = computed(() => latestAttempt.value?.isCorrect ?? false)
 const submit = async () => {
   if (!answer.value.trim()) return
   const countBefore = attempts.value.length
-  await workspace.submitPracticeAnswer(answer.value)
+  await practiceStore.submitPracticeAnswer(answer.value)
   feedbackShown.value = attempts.value.length > countBefore
 }
 
@@ -37,8 +50,8 @@ const editAnswer = () => {
 }
 
 const requestAnother = async () => {
-  await workspace.retryPracticeAssignment()
-  if (!errors.value.practice) {
+  await practiceStore.retryPracticeAssignment()
+  if (!practiceError.value) {
     answer.value = ''
     feedbackShown.value = false
   }
@@ -53,9 +66,9 @@ const formatDate = (value: string) =>
   }).format(new Date(value))
 
 onMounted(async () => {
-  workspace.clearActionMessage()
-  await workspace.loadPlan()
-  if (plan.value) await workspace.loadPractice()
+  noticesStore.clearActionMessage()
+  await plansStore.loadPlan()
+  if (plan.value) await practiceStore.loadPractice()
 })
 </script>
 
@@ -82,7 +95,7 @@ onMounted(async () => {
       </CardContent>
     </Card>
 
-    <Card v-if="loading.plan || (plan && loading.practice)" class="min-h-72">
+    <Card v-if="planLoading || (plan && practiceLoading)" class="min-h-72">
       <CardContent
         class="grid min-h-72 content-center gap-4 p-6 sm:grid-cols-[minmax(0,1fr)_280px]"
       >
@@ -107,11 +120,11 @@ onMounted(async () => {
       </CardContent>
     </Card>
 
-    <Alert v-else-if="errors.practice && !assignment" class="min-h-64 content-center">
+    <Alert v-else-if="practiceError && !assignment" class="min-h-64 content-center">
       <AlertTitle>Не удалось открыть практику</AlertTitle>
       <AlertDescription class="grid gap-4">
-        <span>{{ errors.practice }}</span
-        ><Button variant="outline" class="w-fit" @click="workspace.loadPractice">
+        <span>{{ practiceError }}</span
+        ><Button variant="outline" class="w-fit" @click="practiceStore.loadPractice">
           Повторить
         </Button>
       </AlertDescription>
@@ -169,7 +182,7 @@ onMounted(async () => {
                   />
                 </div>
 
-                <Alert v-if="errors.practice" class="border-neutral-300" role="alert">
+                <Alert v-if="practiceError" class="border-neutral-300" role="alert">
                   <AlertDescription>
                     Ответ не отправлен. Текст остался в форме — попробуйте ещё раз.
                   </AlertDescription>
@@ -180,8 +193,8 @@ onMounted(async () => {
                     <Button
                       variant="outline"
                       type="button"
-                      :disabled="loading.practiceAction"
-                      @click="workspace.requestPracticeHint"
+                      :disabled="practiceActionLoading"
+                      @click="practiceStore.requestPracticeHint"
                     >
                       <Lightbulb /> Показать подсказку
                     </Button>
@@ -190,10 +203,10 @@ onMounted(async () => {
                   <Button
                     class="answer-submit"
                     type="submit"
-                    :disabled="!answer.trim() || loading.practiceAction"
+                    :disabled="!answer.trim() || practiceActionLoading"
                   >
                     <Check />
-                    {{ loading.practiceAction ? 'Проверяем…' : 'Проверить ответ' }}
+                    {{ practiceActionLoading ? 'Проверяем…' : 'Проверить ответ' }}
                   </Button>
                 </div>
               </form>
@@ -218,7 +231,7 @@ onMounted(async () => {
                 <Button
                   variant="outline"
                   type="button"
-                  :disabled="loading.practiceAction"
+                  :disabled="practiceActionLoading"
                   @click="requestAnother"
                 >
                   <RotateCcw /> Начать новую попытку

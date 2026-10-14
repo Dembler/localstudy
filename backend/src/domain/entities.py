@@ -90,3 +90,10 @@ class Attempt:
     score: int
     hint_used: bool
     created_at: datetime
+
+
+@dataclass(slots=True, frozen=True)
+class AnswerEvaluation:
+    is_correct: bool
+    score: int
+    hinted_score: int

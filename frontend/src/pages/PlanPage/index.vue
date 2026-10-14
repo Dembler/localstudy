@@ -39,13 +39,29 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useLearningWorkspaceStore } from '@/shared/stores/learning'
+import { usePlanStore } from '@/shared/stores/plans'
+import { useCatalogStore } from '@/shared/stores/catalog'
+import { useSessionsStore } from '@/shared/stores/sessions'
+import { usePracticeStore } from '@/shared/stores/practice'
+import { useNoticesStore } from '@/shared/stores/notices'
 
-const workspace = useLearningWorkspaceStore()
+const plansStore = usePlanStore()
+const {
+  plan,
+  actionLoading: planActionLoading,
+  loading: planLoading,
+  error: planError,
+} = storeToRefs(plansStore)
+const catalogStore = useCatalogStore()
+const { courses, demoMode: catalogDemoMode } = storeToRefs(catalogStore)
+const sessionsStore = useSessionsStore()
+const { sessions, actionLoading: sessionActionLoading } = storeToRefs(sessionsStore)
+const practiceStore = usePracticeStore()
+const { assignment } = storeToRefs(practiceStore)
+const noticesStore = useNoticesStore()
+const { actionMessage } = storeToRefs(noticesStore)
 const route = useRoute()
 const router = useRouter()
-const { plan, courses, sessions, assignment, loading, errors, demoMode, actionMessage } =
-  storeToRefs(workspace)
 
 const weeklyHours = ref(4)
 const setupCourseId = ref('')
@@ -93,17 +109,18 @@ const formatDateTime = (value: string) =>
   }).format(new Date(value))
 
 const submitCreate = async () => {
-  if (!setupCourseId.value) return
-  await workspace.createNewPlan({
+  const course = courses.value.find((item) => item.id === setupCourseId.value)
+  if (!course) return
+  await plansStore.createNewPlan({
     weeklyMinutes: weeklyHours.value * 60,
-    courseId: setupCourseId.value,
+    course,
   })
-  if (plan.value) await Promise.all([workspace.loadSessions(), workspace.loadPractice()])
+  if (plan.value) await Promise.all([sessionsStore.loadSessions(), practiceStore.loadPractice()])
 }
 
 const runPrimary = async () => {
   if (focusSession.value?.status === 'in_progress') {
-    await workspace.advanceSession(focusSession.value.id)
+    await sessionsStore.advanceSession(focusSession.value.id)
     return
   }
   if (practiceIsNext.value) {
@@ -111,14 +128,18 @@ const runPrimary = async () => {
     return
   }
   if (focusSession.value) {
-    await workspace.advanceSession(focusSession.value.id)
+    await sessionsStore.advanceSession(focusSession.value.id)
     return
   }
   await router.push('/sessions')
 }
 
+const rebalanceSchedule = async () => {
+  if (await plansStore.rebalanceCurrentPlan()) await sessionsStore.loadSessions()
+}
+
 const resetPlan = () => {
-  workspace.clearActivePlan()
+  plansStore.clearActivePlan()
   resetDialogOpen.value = false
 }
 
@@ -131,11 +152,11 @@ watch(
 )
 
 onMounted(async () => {
-  workspace.clearActionMessage()
-  await Promise.all([workspace.loadPlan(), workspace.loadCatalog()])
+  noticesStore.clearActionMessage()
+  await Promise.all([plansStore.loadPlan(), catalogStore.loadCatalog()])
   const courseFromQuery = typeof route.query.course === 'string' ? route.query.course : ''
   setupCourseId.value = courses.value.find((course) => course.id === courseFromQuery)?.id ?? ''
-  if (plan.value) await Promise.all([workspace.loadSessions(), workspace.loadPractice()])
+  if (plan.value) await Promise.all([sessionsStore.loadSessions(), practiceStore.loadPractice()])
 })
 </script>
 
@@ -170,7 +191,7 @@ onMounted(async () => {
       </CardContent>
     </Card>
 
-    <Card v-if="loading.plan" class="min-h-52">
+    <Card v-if="planLoading" class="min-h-52">
       <CardContent class="flex min-h-52 flex-col justify-center gap-4 p-6">
         <span class="text-sm font-medium">Открываем ваш план…</span>
         <Skeleton class="h-5 w-2/3" />
@@ -250,12 +271,12 @@ onMounted(async () => {
             </div>
 
             <div class="grid min-h-12 gap-2">
-              <Alert v-if="errors.plan" class="border-neutral-400 bg-white" role="alert">
+              <Alert v-if="planError" class="border-neutral-400 bg-white" role="alert">
                 <AlertDescription>
                   План не удалось создать. Проверьте подключение и попробуйте ещё раз.
                 </AlertDescription>
               </Alert>
-              <Alert v-if="demoMode.catalog" class="border-neutral-400 bg-white" role="alert">
+              <Alert v-if="catalogDemoMode" class="border-neutral-400 bg-white" role="alert">
                 <AlertDescription>
                   Не удалось загрузить доступные курсы. Обновите список, чтобы создать настоящий
                   план.
@@ -264,7 +285,7 @@ onMounted(async () => {
                     size="sm"
                     class="mt-3"
                     type="button"
-                    @click="workspace.loadCatalog"
+                    @click="catalogStore.loadCatalog"
                   >
                     Обновить курсы
                   </Button>
@@ -276,9 +297,9 @@ onMounted(async () => {
               <Button
                 type="submit"
                 size="lg"
-                :disabled="loading.planAction || demoMode.catalog || !setupCourseId"
+                :disabled="planActionLoading || catalogDemoMode || !setupCourseId"
               >
-                <Flag /> {{ loading.planAction ? 'Создаём маршрут…' : 'Создать маршрут' }}
+                <Flag /> {{ planActionLoading ? 'Создаём маршрут…' : 'Создать маршрут' }}
               </Button>
               <span>После этого предложим запланировать первое занятие.</span>
             </div>
@@ -289,8 +310,8 @@ onMounted(async () => {
 
     <template v-else>
       <div class="mb-4 min-h-12">
-        <Alert v-if="actionMessage || errors.plan" class="border-neutral-300" role="status">
-          <AlertDescription>{{ errors.plan || actionMessage }}</AlertDescription>
+        <Alert v-if="actionMessage || planError" class="border-neutral-300" role="status">
+          <AlertDescription>{{ planError || actionMessage }}</AlertDescription>
         </Alert>
       </div>
 
@@ -327,11 +348,11 @@ onMounted(async () => {
               <p>Выберите удобное время — начнём с первого шага вашего учебного маршрута.</p>
             </template>
           </div>
-          <Button size="lg" type="button" :disabled="loading.sessionAction" @click="runPrimary">
+          <Button size="lg" type="button" :disabled="sessionActionLoading" @click="runPrimary">
             <Check v-if="focusSession?.status === 'in_progress' && !practiceIsNext" />
             <Play v-else-if="focusSession && !practiceIsNext" />
             <ArrowRight v-else />
-            {{ loading.sessionAction ? 'Сохраняем…' : primaryLabel }}
+            {{ sessionActionLoading ? 'Сохраняем…' : primaryLabel }}
           </Button>
         </CardContent>
       </Card>
@@ -428,8 +449,8 @@ onMounted(async () => {
                 <Button
                   variant="outline"
                   type="button"
-                  :disabled="loading.planAction"
-                  @click="workspace.updateWorkload(weeklyHours * 60)"
+                  :disabled="planActionLoading"
+                  @click="plansStore.updateWorkload(weeklyHours * 60)"
                 >
                   Сохранить
                 </Button>
@@ -443,10 +464,10 @@ onMounted(async () => {
             <Button
               variant="outline"
               type="button"
-              :disabled="loading.planAction"
-              @click="workspace.rebalanceCurrentPlan"
+              :disabled="planActionLoading"
+              @click="rebalanceSchedule"
             >
-              <RefreshCw :class="{ 'is-spinning': loading.planAction }" /> Перестроить расписание
+              <RefreshCw :class="{ 'is-spinning': planActionLoading }" /> Перестроить расписание
             </Button>
             <Button variant="ghost" type="button" @click="resetDialogOpen = true">
               Выбрать другой курс

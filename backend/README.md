@@ -38,10 +38,12 @@ alembic upgrade head
 ## Architecture
 
 - `src/api`: HTTP routers, settings, middleware, handlers, DI assembly.
-- `src/application`: use-case service, repository port, request/response schemas.
+- `src/application`: feature services, narrow reader/writer ports, result DTOs,
+  and replaceable scheduling, answer, scoring, selection and recommendation policies.
 - `src/domain`: entities, enums, and domain exceptions.
-- `src/infrastructure`: SQLAlchemy models, repository, logging, demo seed.
-- `tests`: route contract and representative behavior/error tests.
+- `src/infrastructure`: SQLAlchemy models and feature repositories, clock, logging, demo seed.
+- `tests`: HTTP contract, policy substitution, shared SQLAlchemy/in-memory repository
+  contracts, atomic writes, rollback and concurrent hint consumption.
 
-The API intentionally has exactly 25 business operations. `/health`, OpenAPI,
+The API has 29 business operations. `/health`, OpenAPI,
 Swagger UI, and ReDoc are technical endpoints and are excluded from that count.

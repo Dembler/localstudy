@@ -1,4 +1,4 @@
-# Контракт 25 прикладных API-операций
+# Контракт 29 прикладных API-операций
 
 Базовый префикс: `/api/v1`. Технический `GET /health` существует отдельно и в
 лимит не входит.
@@ -13,7 +13,7 @@
 | 4 | GET | `/courses/{course_id}/prerequisites` | Получить полный список пререквизитов в порядке изучения |
 | 5 | GET | `/lessons/{lesson_id}/preview` | Получить открытый предпросмотр урока |
 
-## Учебный план — 5
+## Учебный план — 8
 
 | № | Метод | Путь | Назначение |
 |---:|---|---|---|
@@ -22,36 +22,40 @@
 | 8 | POST | `/plans/{plan_id}/goals` | Добавить цель в план |
 | 9 | POST | `/plans/{plan_id}/rebalance` | Перестроить порядок занятий |
 | 10 | GET | `/plans/{plan_id}/forecast` | Спрогнозировать завершение |
+| 11 | DELETE | `/plans/{plan_id}` | Удалить план, его цели и занятия |
+| 12 | DELETE | `/plans/{plan_id}/goals/{goal_id}` | Удалить цель из плана |
+| 13 | DELETE | `/plans/{plan_id}/courses/{course_id}` | Убрать курс и его будущие занятия из плана |
 
-## Учебные сессии — 5
+## Учебные сессии — 6
 
 | № | Метод | Путь | Назначение |
 |---:|---|---|---|
-| 11 | GET | `/sessions/calendar` | Получить календарь сессий |
-| 12 | POST | `/sessions` | Запланировать сессию |
-| 13 | POST | `/sessions/{session_id}/start` | Начать сессию |
-| 14 | POST | `/sessions/{session_id}/complete` | Завершить сессию |
-| 15 | POST | `/sessions/{session_id}/reschedule` | Перенести сессию |
+| 14 | GET | `/sessions/calendar` | Получить календарь сессий |
+| 15 | POST | `/sessions` | Запланировать сессию |
+| 16 | POST | `/sessions/{session_id}/start` | Начать сессию |
+| 17 | POST | `/sessions/{session_id}/complete` | Завершить сессию |
+| 18 | POST | `/sessions/{session_id}/reschedule` | Перенести сессию |
+| 19 | DELETE | `/sessions/{session_id}` | Удалить запланированную сессию |
 
 ## Практика — 5
 
 | № | Метод | Путь | Назначение |
 |---:|---|---|---|
-| 16 | GET | `/practice/next` | Получить следующее задание |
-| 17 | POST | `/practice/assignments/{assignment_id}/attempts` | Отправить ответ |
-| 18 | POST | `/practice/assignments/{assignment_id}/hint` | Запросить подсказку |
-| 19 | POST | `/practice/assignments/{assignment_id}/retry` | Создать повтор задания |
-| 20 | GET | `/practice/assignments/{assignment_id}/attempts` | Получить историю попыток |
+| 20 | GET | `/practice/next` | Получить следующее задание |
+| 21 | POST | `/practice/assignments/{assignment_id}/attempts` | Отправить ответ |
+| 22 | POST | `/practice/assignments/{assignment_id}/hint` | Запросить подсказку |
+| 23 | POST | `/practice/assignments/{assignment_id}/retry` | Создать повтор задания |
+| 24 | GET | `/practice/assignments/{assignment_id}/attempts` | Получить историю попыток |
 
 ## Аналитика — 5
 
 | № | Метод | Путь | Назначение |
 |---:|---|---|---|
-| 21 | GET | `/analytics/overview` | Получить сводку прогресса |
-| 22 | GET | `/analytics/skills` | Получить матрицу навыков |
-| 23 | GET | `/analytics/streak` | Получить серию занятий |
-| 24 | GET | `/analytics/weak-topics` | Найти слабые темы |
-| 25 | GET | `/analytics/recommendations` | Получить следующие рекомендации |
+| 25 | GET | `/analytics/overview` | Получить сводку прогресса |
+| 26 | GET | `/analytics/skills` | Получить матрицу навыков |
+| 27 | GET | `/analytics/streak` | Получить серию занятий |
+| 28 | GET | `/analytics/weak-topics` | Найти слабые темы |
+| 29 | GET | `/analytics/recommendations` | Получить следующие рекомендации |
 
 ## Общие правила ответа
 
@@ -60,6 +64,9 @@
   деталями и `request_id`.
 - Невалидный ввод дает `422`, отсутствие сущности — `404`, нарушение
   бизнес-состояния — `409`.
+- Успешное удаление возвращает `204` без тела. Удаление курса сохраняет
+  завершённые занятия, удаляет запланированные и запрещено для последнего курса,
+  обязательного пререквизита или курса с текущим занятием.
 - Все даты передаются в ISO 8601, длительность — в минутах.
 - Идентификатор демонстрационного учащегося временно передается параметром или
   задается backend по умолчанию; заголовок авторизации не требуется.

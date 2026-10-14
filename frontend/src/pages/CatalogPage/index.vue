@@ -27,12 +27,23 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useLearningWorkspaceStore } from '@/shared/stores/learning'
+import { usePlanStore } from '@/shared/stores/plans'
+import { useCatalogStore } from '@/shared/stores/catalog'
+import { useNoticesStore } from '@/shared/stores/notices'
 
-const workspace = useLearningWorkspaceStore()
+const plansStore = usePlanStore()
+const { plan, goalLoading: catalogActionLoading } = storeToRefs(plansStore)
+const catalogStore = useCatalogStore()
+const {
+  courses,
+  selectedCourse,
+  loading: catalogLoading,
+  error: catalogError,
+  demoMode: catalogDemoMode,
+} = storeToRefs(catalogStore)
+const noticesStore = useNoticesStore()
+const { actionMessage } = storeToRefs(noticesStore)
 const router = useRouter()
-const { plan, courses, selectedCourse, loading, errors, demoMode, actionMessage } =
-  storeToRefs(workspace)
 
 const query = ref('')
 const category = ref('Все направления')
@@ -87,11 +98,11 @@ const resetFilters = async () => {
   query.value = ''
   category.value = 'Все направления'
   level.value = 'Любой уровень'
-  await workspace.loadCatalog()
+  await catalogStore.loadCatalog()
 }
 const selectCourse = async (courseId: string) => {
   goalAdded.value = false
-  await workspace.selectCourse(courseId)
+  await catalogStore.selectCourse(courseId)
   if (globalThis.matchMedia('(max-width: 760px)').matches) detailOpen.value = true
 }
 const addCourse = async () => {
@@ -100,7 +111,7 @@ const addCourse = async () => {
     await router.push({ path: '/plan', query: { course: selectedCourse.value.id } })
     return
   }
-  goalAdded.value = (await workspace.addSelectedCourseToPlan()) === true
+  goalAdded.value = (await plansStore.addCourseGoal(selectedCourse.value)) === true
   if (goalAdded.value) detailOpen.value = false
 }
 
@@ -116,8 +127,8 @@ const runPrimary = async () => {
 }
 
 onMounted(() => {
-  workspace.clearActionMessage()
-  return Promise.all([workspace.loadPlan(), workspace.loadCatalog()])
+  noticesStore.clearActionMessage()
+  return Promise.all([plansStore.loadPlan(), catalogStore.loadCatalog()])
 })
 </script>
 
@@ -134,7 +145,7 @@ onMounted(() => {
       </div>
     </header>
 
-    <Alert v-if="demoMode.catalog" class="mb-4 border-neutral-300">
+    <Alert v-if="catalogDemoMode" class="mb-4 border-neutral-300">
       <AlertTitle>Показаны демонстрационные данные</AlertTitle>
       <AlertDescription>
         Каталог сейчас недоступен. Выбрать такой курс для реального плана нельзя.
@@ -186,7 +197,7 @@ onMounted(() => {
       </CardContent>
     </Card>
 
-    <Card v-if="loading.catalog && !courses.length" class="min-h-72">
+    <Card v-if="catalogLoading && !courses.length" class="min-h-72">
       <CardContent class="grid min-h-72 gap-3 p-6 sm:grid-cols-[minmax(0,1fr)_360px]">
         <div class="grid content-center gap-3">
           <Skeleton class="h-28 w-full" /><Skeleton class="h-28 w-full" />
@@ -194,11 +205,13 @@ onMounted(() => {
         <Skeleton class="h-full min-h-52 w-full" />
       </CardContent>
     </Card>
-    <Alert v-else-if="errors.catalog && !courses.length" class="min-h-72 content-center">
+    <Alert v-else-if="catalogError && !courses.length" class="min-h-72 content-center">
       <AlertTitle>Не удалось открыть каталог</AlertTitle>
       <AlertDescription class="grid gap-4">
-        <span>{{ errors.catalog }}</span
-        ><Button variant="outline" class="w-fit" @click="workspace.loadCatalog"> Повторить </Button>
+        <span>{{ catalogError }}</span
+        ><Button variant="outline" class="w-fit" @click="catalogStore.loadCatalog">
+          Повторить
+        </Button>
       </AlertDescription>
     </Alert>
     <div v-else class="catalog-layout">
@@ -287,10 +300,10 @@ onMounted(() => {
             <Button
               class="mt-6 w-full"
               type="button"
-              :disabled="loading.catalogAction || demoMode.catalog || goalAdded"
+              :disabled="catalogActionLoading || catalogDemoMode || goalAdded"
               @click="runPrimary"
             >
-              {{ loading.catalogAction ? 'Сохраняем…' : primaryLabel }}
+              {{ catalogActionLoading ? 'Сохраняем…' : primaryLabel }}
             </Button>
             <p class="mt-3 mb-0 text-xs leading-relaxed text-neutral-600">
               {{
@@ -330,10 +343,10 @@ onMounted(() => {
           <Button
             class="mt-6 w-full"
             type="button"
-            :disabled="loading.catalogAction || demoMode.catalog || goalAdded"
+            :disabled="catalogActionLoading || catalogDemoMode || goalAdded"
             @click="runPrimary"
           >
-            {{ loading.catalogAction ? 'Сохраняем…' : primaryLabel }}
+            {{ catalogActionLoading ? 'Сохраняем…' : primaryLabel }}
           </Button>
         </template>
       </SheetContent>

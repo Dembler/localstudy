@@ -41,7 +41,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(
         title=resolved.app_name,
         version="0.1.0",
-        description="Adaptive learning tracker with 25 focused business operations.",
+        description="Adaptive learning tracker with 29 focused business operations.",
         lifespan=lifespan,
     )
     setup_dishka(container, app)

@@ -58,10 +58,42 @@ export async function getPlanForecast(
   return apiRequest<PlanForecast>(`/plans/${encodeURIComponent(planId)}/forecast`, options)
 }
 
+export async function deletePlan(planId: EntityId, options?: ApiRequestOptions): Promise<void> {
+  return apiRequest<void>(`/plans/${encodeURIComponent(planId)}`, {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
+export async function deletePlanGoal(
+  planId: EntityId,
+  goalId: EntityId,
+  options?: ApiRequestOptions,
+): Promise<void> {
+  return apiRequest<void>(
+    `/plans/${encodeURIComponent(planId)}/goals/${encodeURIComponent(goalId)}`,
+    { ...options, method: 'DELETE' },
+  )
+}
+
+export async function removePlanCourse(
+  planId: EntityId,
+  courseId: EntityId,
+  options?: ApiRequestOptions,
+): Promise<void> {
+  return apiRequest<void>(
+    `/plans/${encodeURIComponent(planId)}/courses/${encodeURIComponent(courseId)}`,
+    { ...options, method: 'DELETE' },
+  )
+}
+
 export const plansApi = {
   createPlan,
   updatePlanWorkload,
   addPlanGoal,
   rebalancePlan,
   getPlanForecast,
+  deletePlan,
+  deletePlanGoal,
+  removePlanCourse,
 } as const
