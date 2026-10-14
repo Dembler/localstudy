@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3000" height="2260" viewBox="0 0 3000 2260">
+  <defs>
+    <style>
+      text { font-family: "Segoe UI", Arial, sans-serif; fill: #172033; }
+      .title { font-size: 38px; font-weight: 700; }
+      .subtitle { font-size: 20px; fill: #526079; }
+      .section { font-size: 26px; font-weight: 700; }
+      .module { font-size: 22px; font-weight: 700; fill: #334155; }
+      .name { font-size: 22px; font-weight: 700; }
+      .stereo { font-size: 17px; font-style: italic; fill: #64748b; }
+      .method { font-size: 17px; }
+      .small { font-size: 16px; fill: #526079; }
+      .router { fill: #eaf2ff; stroke: #5b8def; stroke-width: 2; }
+      .service { fill: #f3ecff; stroke: #8b5cf6; stroke-width: 2; }
+      .port { fill: #fff7d6; stroke: #d6a800; stroke-width: 2; }
+      .repo { fill: #e9f8ef; stroke: #2f9e5b; stroke-width: 2; }
+      .policy { fill: #fff0e6; stroke: #e97728; stroke-width: 2; }
+      .entity { fill: #f5f7fa; stroke: #64748b; stroke-width: 2; }
+      .divider { stroke: #cad2df; stroke-width: 1.5; }
+      .arrow { fill: none; stroke: #475569; stroke-width: 2.5; marker-end: url(#arrow); }
+      .dependency { fill: none; stroke: #7c3aed; stroke-width: 2.5; stroke-dasharray: 10 8; marker-end: url(#arrow-purple); }
+      .realization { fill: none; stroke: #168647; stroke-width: 2.5; stroke-dasharray: 10 8; marker-end: url(#triangle-green); }
+      .relation { fill: none; stroke: #64748b; stroke-width: 2.5; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="triangle-green" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto">
+      <path d="M1,1 L13,7 L1,13 z" fill="#ffffff" stroke="#168647" stroke-width="2"/>
+    </marker>
+  </defs>
+
+  <rect width="3000" height="2260" fill="#ffffff"/>
+  <text x="40" y="55" class="title">LocalStudy — диаграмма классов backend</text>
+  <text x="40" y="91" class="subtitle">29 бизнес-операций · FastAPI → сервисы → порты → SQLAlchemy-репозитории → SQLite</text>
+
+  <rect x="1970" y="26" width="22" height="22" rx="4" class="router"/><text x="2002" y="44" class="small">API router</text>
+  <rect x="2130" y="26" width="22" height="22" rx="4" class="service"/><text x="2162" y="44" class="small">Service</text>
+  <rect x="2275" y="26" width="22" height="22" rx="4" class="port"/><text x="2307" y="44" class="small">Protocol</text>
+  <rect x="2430" y="26" width="22" height="22" rx="4" class="repo"/><text x="2462" y="44" class="small">Repository</text>
+  <rect x="2615" y="26" width="22" height="22" rx="4" class="policy"/><text x="2647" y="44" class="small">Policy</text>
+
+  <text x="40" y="142" class="section">Прикладные модули и зависимости</text>
+
+  <!-- Module labels -->
+  <text x="55" y="188" class="module">КАТАЛОГ · 5 операций</text>
+  <text x="645" y="188" class="module">ПЛАНЫ · 8 операций</text>
+  <text x="1235" y="188" class="module">ЗАНЯТИЯ · 6 операций</text>
+  <text x="1825" y="188" class="module">ПРАКТИКА · 5 операций</text>
+  <text x="2415" y="188" class="module">АНАЛИТИКА · 5 операций</text>
+
+  <!-- Routers -->
+  <rect x="40" y="205" width="550" height="70" rx="12" class="router"/>
+  <text x="315" y="234" text-anchor="middle" class="name">CoursesRouter</text><text x="315" y="259" text-anchor="middle" class="small">GET /courses · /search · /preview</text>
+  <rect x="630" y="205" width="550" height="70" rx="12" class="router"/>
+  <text x="905" y="234" text-anchor="middle" class="name">PlansRouter</text><text x="905" y="259" text-anchor="middle" class="small">POST · PATCH · GET · DELETE</text>
+  <rect x="1220" y="205" width="550" height="70" rx="12" class="router"/>
+  <text x="1495" y="234" text-anchor="middle" class="name">SessionsRouter</text><text x="1495" y="259" text-anchor="middle" class="small">calendar · start · complete · reschedule</text>
+  <rect x="1810" y="205" width="550" height="70" rx="12" class="router"/>
+  <text x="2085" y="234" text-anchor="middle" class="name">PracticeRouter</text><text x="2085" y="259" text-anchor="middle" class="small">next · attempts · hint · retry</text>
+  <rect x="2400" y="205" width="550" height="70" rx="12" class="router"/>
+  <text x="2675" y="234" text-anchor="middle" class="name">AnalyticsRouter</text><text x="2675" y="259" text-anchor="middle" class="small">overview · skills · streak · topics</text>
+
+  <!-- Router to service arrows -->
+  <path d="M315 275 V315" class="arrow"/><path d="M905 275 V315" class="arrow"/><path d="M1495 275 V315" class="arrow"/><path d="M2085 275 V315" class="arrow"/><path d="M2675 275 V315" class="arrow"/>
+
+  <!-- Services -->
+  <rect x="40" y="320" width="550" height="390" rx="14" class="service"/>
+  <text x="315" y="355" text-anchor="middle" class="name">CatalogService</text><line x1="40" y1="370" x2="590" y2="370" class="divider"/>
+  <text x="65" y="405" class="method">+ list_courses(level, skill): CourseList</text>
+  <text x="65" y="443" class="method">+ search_courses(query): CourseList</text>
+  <text x="65" y="481" class="method">+ get_course(course_id): CourseDetail</text>
+  <text x="65" y="519" class="method">+ prerequisites(course_id): CourseList</text>
+  <text x="65" y="557" class="method">+ lesson_preview(lesson_id): LessonPreview</text>
+  <line x1="40" y1="579" x2="590" y2="579" class="divider"/>
+  <text x="65" y="611" class="small">Читает каталог и формирует DTO.</text>
+  <text x="65" y="640" class="small">Не знает о SQLAlchemy и HTTP.</text>
+
+  <rect x="630" y="320" width="550" height="390" rx="14" class="service"/>
+  <text x="905" y="355" text-anchor="middle" class="name">PlanService</text><line x1="630" y1="370" x2="1180" y2="370" class="divider"/>
+  <text x="655" y="402" class="method">+ create_plan(...): PlanView</text>
+  <text x="655" y="436" class="method">+ update_workload(...): PlanView</text>
+  <text x="655" y="470" class="method">+ add_goal(...): GoalView</text>
+  <text x="655" y="504" class="method">+ delete_plan(plan_id): None</text>
+  <text x="655" y="538" class="method">+ delete_goal(plan_id, goal_id): None</text>
+  <text x="655" y="572" class="method">+ remove_course(plan_id, course_id): None</text>
+  <text x="655" y="606" class="method">+ rebalance(plan_id): RebalanceResult</text>
+  <text x="655" y="640" class="method">+ forecast(plan_id): ForecastView</text>
+  <line x1="630" y1="660" x2="1180" y2="660" class="divider"/>
+  <text x="655" y="691" class="small">Управляет планом, целями и расписанием.</text>
+
+  <rect x="1220" y="320" width="550" height="390" rx="14" class="service"/>
+  <text x="1495" y="355" text-anchor="middle" class="name">SessionService</text><line x1="1220" y1="370" x2="1770" y2="370" class="divider"/>
+  <text x="1245" y="405" class="method">+ calendar(from, to): SessionCalendar</text>
+  <text x="1245" y="443" class="method">+ create_session(...): SessionView</text>
+  <text x="1245" y="481" class="method">+ start_session(id): SessionView</text>
+  <text x="1245" y="519" class="method">+ complete_session(id, score): SessionView</text>
+  <text x="1245" y="557" class="method">+ reschedule_session(...): SessionView</text>
+  <text x="1245" y="595" class="method">+ delete_session(id): None</text>
+  <line x1="1220" y1="617" x2="1770" y2="617" class="divider"/>
+  <text x="1245" y="649" class="small">Контролирует переходы статусов:</text>
+  <text x="1245" y="678" class="small">planned → in_progress → completed.</text>
+
+  <rect x="1810" y="320" width="550" height="390" rx="14" class="service"/>
+  <text x="2085" y="355" text-anchor="middle" class="name">PracticeService</text><line x1="1810" y1="370" x2="2360" y2="370" class="divider"/>
+  <text x="1835" y="405" class="method">+ next_assignment(...): AssignmentView</text>
+  <text x="1835" y="443" class="method">+ submit_attempt(...): AttemptView</text>
+  <text x="1835" y="481" class="method">+ hint(assignment_id): HintView</text>
+  <text x="1835" y="519" class="method">+ retry(assignment_id): RetryView</text>
+  <text x="1835" y="557" class="method">+ attempt_history(id): AttemptHistory</text>
+  <line x1="1810" y1="579" x2="2360" y2="579" class="divider"/>
+  <text x="1835" y="611" class="small">Проверяет ответы, считает баллы,</text>
+  <text x="1835" y="640" class="small">учитывает подсказки и выбирает задания.</text>
+
+  <rect x="2400" y="320" width="550" height="390" rx="14" class="service"/>
+  <text x="2675" y="355" text-anchor="middle" class="name">AnalyticsService</text><line x1="2400" y1="370" x2="2950" y2="370" class="divider"/>
+  <text x="2425" y="405" class="method">+ analytics_overview(): OverviewAnalytics</text>
+  <text x="2425" y="443" class="method">+ analytics_skills(): SkillsAnalytics</text>
+  <text x="2425" y="481" class="method">+ analytics_streak(): StreakAnalytics</text>
+  <text x="2425" y="519" class="method">+ analytics_weak_topics(): WeakTopics</text>
+  <text x="2425" y="557" class="method">+ analytics_recommendations(): Recommendations</text>
+  <line x1="2400" y1="579" x2="2950" y2="579" class="divider"/>
+  <text x="2425" y="611" class="small">Только читает данные через Reader-порты.</text>
+  <text x="2425" y="640" class="small">Вычисляет прогресс и рекомендации.</text>
+
+  <!-- Service to port dependencies -->
+  <path d="M315 710 V770" class="dependency"/><path d="M905 710 V770" class="dependency"/><path d="M1495 710 V770" class="dependency"/><path d="M2085 710 V770" class="dependency"/><path d="M2675 710 V770" class="dependency"/>
+
+  <!-- Ports -->
+  <rect x="40" y="775" width="550" height="265" rx="14" class="port"/>
+  <text x="315" y="808" text-anchor="middle" class="stereo">«interface»</text><text x="315" y="838" text-anchor="middle" class="name">CatalogReader</text><line x1="40" y1="852" x2="590" y2="852" class="divider"/>
+  <text x="65" y="886" class="method">+ list_courses() · search_courses()</text><text x="65" y="920" class="method">+ get_course() · get_courses()</text><text x="65" y="954" class="method">+ get_lesson() · list_lessons()</text><text x="65" y="988" class="method">+ count_lessons_by_course()</text>
+
+  <rect x="630" y="775" width="550" height="265" rx="14" class="port"/>
+  <text x="905" y="808" text-anchor="middle" class="stereo">«interfaces»</text><text x="905" y="838" text-anchor="middle" class="name">PlanReader / PlanRepository</text><line x1="630" y1="852" x2="1180" y2="852" class="divider"/>
+  <text x="655" y="886" class="method">Reader: get_plan() · list_plans()</text><text x="655" y="920" class="method">Repository: create_plan() · update()</text><text x="655" y="954" class="method">add_goal() · delete_goal()</text><text x="655" y="988" class="method">delete_plan() · remove_course()</text>
+
+  <rect x="1220" y="775" width="550" height="265" rx="14" class="port"/>
+  <text x="1495" y="808" text-anchor="middle" class="stereo">«interfaces»</text><text x="1495" y="838" text-anchor="middle" class="name">SessionReader / SessionRepository</text><line x1="1220" y1="852" x2="1770" y2="852" class="divider"/>
+  <text x="1245" y="886" class="method">Reader: list_sessions() · get_session()</text><text x="1245" y="920" class="method">Repository: create_session()</text><text x="1245" y="954" class="method">save_session() · save_sessions()</text><text x="1245" y="988" class="method">delete_session()</text>
+
+  <rect x="1810" y="775" width="550" height="265" rx="14" class="port"/>
+  <text x="2085" y="808" text-anchor="middle" class="stereo">«interfaces»</text><text x="2085" y="838" text-anchor="middle" class="name">PracticeReader / PracticeRepository</text><line x1="1810" y1="852" x2="2360" y2="852" class="divider"/>
+  <text x="1835" y="886" class="method">Reader: assignments() · attempts()</text><text x="1835" y="920" class="method">answer_for()</text><text x="1835" y="954" class="method">Repository: mark_hint() · clear_hint()</text><text x="1835" y="988" class="method">record_attempt()</text>
+
+  <rect x="2400" y="775" width="550" height="265" rx="14" class="port"/>
+  <text x="2675" y="808" text-anchor="middle" class="stereo">«read-only dependencies»</text><text x="2675" y="838" text-anchor="middle" class="name">Reader Ports</text><line x1="2400" y1="852" x2="2950" y2="852" class="divider"/>
+  <text x="2425" y="886" class="method">PlanReader</text><text x="2425" y="920" class="method">CatalogReader</text><text x="2425" y="954" class="method">SessionReader</text><text x="2425" y="988" class="method">PracticeReader</text>
+
+  <!-- Repositories -->
+  <rect x="40" y="1125" width="550" height="120" rx="14" class="repo"/><text x="315" y="1170" text-anchor="middle" class="name">SqlAlchemyCatalogRepository</text><text x="315" y="1204" text-anchor="middle" class="small">SELECT courses / lessons → domain entities</text>
+  <rect x="630" y="1125" width="550" height="120" rx="14" class="repo"/><text x="905" y="1170" text-anchor="middle" class="name">SqlAlchemyPlanRepository</text><text x="905" y="1204" text-anchor="middle" class="small">CRUD plan / goals · atomic DELETE</text>
+  <rect x="1220" y="1125" width="550" height="120" rx="14" class="repo"/><text x="1495" y="1170" text-anchor="middle" class="name">SqlAlchemySessionRepository</text><text x="1495" y="1204" text-anchor="middle" class="small">CRUD sessions · batch save</text>
+  <rect x="1810" y="1125" width="550" height="120" rx="14" class="repo"/><text x="2085" y="1170" text-anchor="middle" class="name">SqlAlchemyPracticeRepository</text><text x="2085" y="1204" text-anchor="middle" class="small">attempt + hint in one transaction</text>
+  <rect x="2400" y="1125" width="550" height="120" rx="14" class="repo"/><text x="2675" y="1170" text-anchor="middle" class="name">AsyncSession / SQLite</text><text x="2675" y="1204" text-anchor="middle" class="small">Общая зависимость репозиториев · request scope</text>
+
+  <!-- Repo realizes port -->
+  <path d="M315 1125 V1045" class="realization"/><path d="M905 1125 V1045" class="realization"/><path d="M1495 1125 V1045" class="realization"/><path d="M2085 1125 V1045" class="realization"/>
+
+  <!-- Policies -->
+  <text x="40" y="1320" class="section">Заменяемые политики</text>
+  <rect x="630" y="1345" width="550" height="165" rx="14" class="policy"/>
+  <text x="905" y="1385" text-anchor="middle" class="name">Алгоритмы плана</text><text x="905" y="1422" text-anchor="middle" class="small">PrerequisiteResolver · WeeklySchedulePolicy</text><text x="905" y="1455" text-anchor="middle" class="small">Граф зависимостей · распределение занятий</text>
+  <rect x="1810" y="1345" width="550" height="165" rx="14" class="policy"/>
+  <text x="2085" y="1385" text-anchor="middle" class="name">Политики практики</text><text x="2085" y="1422" text-anchor="middle" class="small">AnyAnswerChecker · FixedScoringPolicy</text><text x="2085" y="1455" text-anchor="middle" class="small">LeastMasteredAssignmentSelector</text>
+  <rect x="2400" y="1345" width="550" height="165" rx="14" class="policy"/>
+  <text x="2675" y="1385" text-anchor="middle" class="name">RuleBasedRecommendations</text><text x="2675" y="1422" text-anchor="middle" class="small">WeakTopicsRule · UpcomingSessionRule</text><text x="2675" y="1455" text-anchor="middle" class="small">KeepMomentumRule</text>
+  <path d="M905 1345 V715" class="dependency"/><path d="M2085 1345 V715" class="dependency"/><path d="M2675 1345 V715" class="dependency"/>
+
+  <!-- Domain entities -->
+  <text x="40" y="1590" class="section">Основные сущности предметной области</text>
+
+  <rect x="70" y="1630" width="570" height="190" rx="14" class="entity"/><text x="355" y="1670" text-anchor="middle" class="name">Course</text><line x1="70" y1="1685" x2="640" y2="1685" class="divider"/><text x="95" y="1720" class="method">id · title · level · duration_minutes</text><text x="95" y="1755" class="method">skills · prerequisite_ids</text><text x="95" y="1790" class="small">Курс существует независимо от плана.</text>
+  <rect x="810" y="1630" width="570" height="190" rx="14" class="entity"/><text x="1095" y="1670" text-anchor="middle" class="name">Lesson</text><line x1="810" y1="1685" x2="1380" y2="1685" class="divider"/><text x="835" y="1720" class="method">id · course_id · title · position</text><text x="835" y="1755" class="method">duration_minutes · preview</text><text x="835" y="1790" class="small">Принадлежит одному курсу.</text>
+  <rect x="1550" y="1630" width="570" height="190" rx="14" class="entity"/><text x="1835" y="1670" text-anchor="middle" class="name">Assignment</text><line x1="1550" y1="1685" x2="2120" y2="1685" class="divider"/><text x="1575" y="1720" class="method">id · lesson_id · topic · prompt</text><text x="1575" y="1755" class="method">hint · difficulty</text><text x="1575" y="1790" class="small">Практическое задание урока.</text>
+  <rect x="2290" y="1630" width="570" height="190" rx="14" class="entity"/><text x="2575" y="1670" text-anchor="middle" class="name">Attempt</text><line x1="2290" y1="1685" x2="2860" y2="1685" class="divider"/><text x="2315" y="1720" class="method">assignment_id · answer · is_correct</text><text x="2315" y="1755" class="method">score · hint_used · created_at</text><text x="2315" y="1790" class="small">Сохранённый результат ответа.</text>
+
+  <path d="M640 1725 H805" class="relation"/><text x="722" y="1708" text-anchor="middle" class="small">1 → 0..*</text>
+  <path d="M1380 1725 H1545" class="relation"/><text x="1462" y="1708" text-anchor="middle" class="small">1 → 0..*</text>
+  <path d="M2120 1725 H2285" class="relation"/><text x="2202" y="1708" text-anchor="middle" class="small">1 → 0..*</text>
+
+  <rect x="255" y="1940" width="570" height="190" rx="14" class="entity"/><text x="540" y="1980" text-anchor="middle" class="name">StudyPlan</text><line x1="255" y1="1995" x2="825" y2="1995" class="divider"/><text x="280" y="2030" class="method">id · name · weekly_minutes</text><text x="280" y="2065" class="method">start_date · course_ids · created_at</text><text x="280" y="2100" class="small">Маршрут обучения пользователя.</text>
+  <rect x="1215" y="1940" width="570" height="190" rx="14" class="entity"/><text x="1500" y="1980" text-anchor="middle" class="name">Goal</text><line x1="1215" y1="1995" x2="1785" y2="1995" class="divider"/><text x="1240" y="2030" class="method">id · plan_id · title · target_date</text><text x="1240" y="2065" class="method">target_minutes · progress_percent</text><text x="1240" y="2100" class="small">Удаляется вместе с планом.</text>
+  <rect x="2175" y="1940" width="570" height="190" rx="14" class="entity"/><text x="2460" y="1980" text-anchor="middle" class="name">StudySession</text><line x1="2175" y1="1995" x2="2745" y2="1995" class="divider"/><text x="2200" y="2030" class="method">plan_id · lesson_id · scheduled_for</text><text x="2200" y="2065" class="method">status · started_at · completed_at · score</text><text x="2200" y="2100" class="small">planned → in_progress → completed</text>
+
+  <path d="M825 2015 H1210" class="relation"/><text x="1017" y="1998" text-anchor="middle" class="small">1 → 0..* goals</text>
+  <path d="M825 2070 H2170" class="relation"/><text x="1497" y="2053" text-anchor="middle" class="small">1 → 0..* sessions</text>
+  <path d="M1095 1820 V1885 H2460 V1935" class="relation"/><text x="1780" y="1870" text-anchor="middle" class="small">Lesson 1 → 0..* StudySession</text>
+
+  <text x="40" y="2205" class="subtitle">Ключевая идея: сервисы зависят от Protocol-интерфейсов, а SQLAlchemy-репозитории реализуют эти интерфейсы. Связи собирает Dishka.</text>
+</svg>

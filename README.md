@@ -4,7 +4,8 @@
 персональным планом, календарём занятий, практикой и аналитикой.
 
 Проект содержит **29 прикладных HTTP-операций**. Полный перечень находится в
-[docs/api-contract.md](docs/api-contract.md).
+[docs/api-contract.md](docs/api-contract.md). Подробная схема классов и связей находится в
+[docs/class-diagram.md](docs/class-diagram.md).
 Технический `GET /health` в это количество не входит.
 
 ## Структура
