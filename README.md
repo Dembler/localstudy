@@ -31,13 +31,19 @@ envelope реализованы внутри проекта.
 ### Backend
 
 ```powershell
-cd backend
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
-Copy-Item .env.example .env
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+Copy-Item backend\.env.example backend\.env
+cd backend
 python run.py
 ```
+
+В Linux или macOS команда активации окружения: `source .venv/bin/activate`.
+Для разработки backend со средствами тестирования вместо `requirements.txt`
+можно установить пакет командой `python -m pip install -e "./backend[dev]"` из
+корня проекта.
 
 API будет доступен на `http://127.0.0.1:8000`, Swagger UI — на
 `http://127.0.0.1:8000/docs`. При первом запуске создаётся локальная SQLite БД
@@ -49,7 +55,7 @@ API будет доступен на `http://127.0.0.1:8000`, Swagger UI — н�
 
 ```powershell
 cd frontend
-npm.cmd install
+npm.cmd ci
 npm.cmd run dev
 ```
 

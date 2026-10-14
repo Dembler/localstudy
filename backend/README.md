@@ -6,13 +6,16 @@ private package dependencies and uses async SQLAlchemy with SQLite by default.
 
 ## Run locally
 
-```bash
-python -m venv .venv
-.venv\\Scripts\\activate
-pip install -e ".[dev]"
-copy .env.example .env
+```powershell
+python -m venv ..\.venv
+..\.venv\Scripts\Activate.ps1
+python -m pip install -r ..\requirements.txt
+Copy-Item .env.example .env
 python run.py
 ```
+
+Run these commands from the `backend` directory. On Linux and macOS activate
+the environment with `source ../.venv/bin/activate`.
 
 Swagger UI: <http://127.0.0.1:8000/docs>. Health check: `GET /health`.
 The database is created and populated with demo courses, lessons, a study plan,
